@@ -1,0 +1,109 @@
+@media screen and (min-width: 769px) {
+    .logo {
+        display: block;
+        margin: 25px auto 27px;
+    }
+    .burger {
+        display: none;
+    }
+    .layout {
+        width: 230px;
+    }
+    .layout .nav, .layout .balance {
+        padding: 0 15px !important;
+    }
+    .me-md-auto {
+        margin: 0 auto !important;
+    }
+    .content {
+        margin-top: 100px;
+        padding-left: 60px;   
+    }
+    .content-inner {
+        flex-wrap: wrap;
+        justify-content: center; 
+    }
+    .nav-pills {
+        margin-top: 40px;
+    } 
+    #expenseChart, #incomeChart {
+        min-width: 430px;
+        max-width: 550px;
+        min-height: 430px;
+        max-height: 550px;
+    }
+}   
+@media (max-width: 768px) {
+    .layout {
+        width: 100% !important;
+        flex-direction: column;
+    }
+   .layout .flex-column {
+        width: 100%;
+        flex-direction: row !important;
+        justify-content: space-between;
+        border: none;
+   }
+   .logo {
+        display: flex;
+        justify-content: space-between;
+        margin-left: 15px;
+   }
+   .logo .logos {
+        margin-top: 10px;
+   }   
+   .nav {
+        display: none;
+   }
+   .offcanvas-body .nav-pills {
+        display: flex;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 8px;
+   }
+   .content {
+        margin-top: 60px;
+        padding: 0 15px;
+    } 
+    .balance {
+        padding-top: 25px !important;
+        margin-left: 10px;
+    }  
+    .content-inner {
+        display: flex;
+        flex-direction: column;
+    }
+    .burger {
+        display: block;
+        width: 18px;
+        height: 18px;
+        margin-left: 10px;
+    }
+    .burger .burger-icon{
+        width: 22px;
+        height: 19px;
+    }
+    #incomeChart {
+        margin-bottom: 30px;
+    }        
+}
+       
+@media (min-width: 992px) {
+    .cards-container {
+        justify-content: flex-start !important;
+        flex-direction: row !important;
+    }
+}
+
+
+@media (max-width: 576px) {
+    .cards-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .category-card,
+    .empty-card {
+        max-width: 100%;
+    }
+}

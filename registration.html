@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="center-block">
+<main class="form-signin w-100 m-auto">
+<div class="form-content">
+    <div class="logo">
+        <img src="images/Logo.png" alt="">
+    </div>
+    <h1 class="form-title common-title h3 mb-4 fw-normal text-center">Регистрация</h1>
+        <form>
+            <div class="form-floating mb-3">
+                <div class="input-image"><img src="images/person.png" alt=""></div>
+                <input type="text" class="form-control  custom-height" id="name" placeholder="Имя" required>
+                <label for="name">Имя</label>
+            </div>
+            <div class="form-floating mb-3">
+                <div class="input-image"><img src="images/person.png" alt=""></div>
+                <input type="text" class="form-control custom-height" id="last-name" placeholder="Фамилия" required>
+                <label for="last-name">Фамилия</label>
+            </div>
+            <div class="form-floating mb-3">
+                <div class="input-image"><img src="images/mail.png" alt=""></div>
+                <input type="email" class="form-control custom-height" id="email" placeholder="name@example.com" required>
+                <label for="email">Электронная почта</label>
+            </div>
+            <div class="form-floating mb-3">
+                <div class="input-image"><img src="images/lock.png" alt=""></div>
+                <input type="password" class="form-control custom-height" id="password" placeholder="Пароль" required>
+                <label for="password">Пароль</label>
+            </div>
+            <div class="form-floating mb-3">
+                <div class="input-image"><img src="images/lock.png" alt=""></div>
+                <input type="password" class="form-control custom-height" id="password2" placeholder="Подтверждение пароля" required>
+                <label for="password2">Подтверждение пароля</label>
+            </div>
+            <div class="form-button d-grid gap-2 mt-4">
+                <button class="btn btn-primary w-100 py-2" type="submit">Зарегистрироваться</button>
+            </div>
+            <div class="form-link-reg text-center mt-3">
+                Уже есть аккаунт? <a href="login.html">Войдите в систему</a>
+            </div>
+        </form>
+</main>
+</div>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+<script src="/scripts/reg.js"></script>
+</body>
+</html>

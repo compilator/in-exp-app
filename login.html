@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="center-block">
+<main class="form-signin w-100 m-auto">
+    <form>
+        <div class="logo">
+            <img src="images/Logo.png" alt="">
+        </div>
+        <h1 class="h3 mb-3 fw-normal">Вход</h1>
+        <div class="form-floating">
+            <div class="input-image"><img src="images/mail.png" alt=""></div>
+            <input type="email" class="form-control custom-height" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Электронная почта</label>
+        </div>
+        <div class="form-floating">
+            <div class="input-image"><img src="images/lock.png" alt=""></div>
+            <input type="password" class="form-control custom-height" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Пароль</label>
+        </div>
+        <div class="form-check text-start my-3">
+            <input class="form-check-input" type="checkbox" value="remember-me" id="checkDefault">
+            <label class="form-check-label" for="checkDefault">Запомнить меня</label>
+        </div>
+        <button class="btn btn-primary w-100 py-2" type="submit">Войти</button>
+        <div class="form-link">Нет аккаунта <a href="registration.html">Пройдите регистрацию</a></div>
+            </div>
+</main>
+</div>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+<script src="/scripts/login.js"></script>
+</body>
+</html>
