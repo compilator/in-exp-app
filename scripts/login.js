@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Валидация пароля
     function validatePassword() {
         const value = passwordInput.value;
         

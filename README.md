@@ -14,17 +14,14 @@
 • HTML5 / CSS3 / JavaScript (ES6+)
 • Bootstrap 5.2+
 • Chart.js для визуализации
-• Ванильный JS или [укажите фреймворк, если используется]
 
 Бэкенд:
-• [Укажите: Node.js / Python / PHP / .NET и т.д.]
-• REST API
-• База данных: [укажите: PostgreSQL / MySQL / MongoDB и т.д.]
+
 
 Инструменты:
 • Git / GitHub
-• [опционально: Webpack, Vite, ESLint и др.]
-```
+• 
+
 
 
 ## 📁 Структура проекта (пример)
