@@ -23,23 +23,3 @@
 • 
 
 
-
-## 📁 Структура проекта (пример)
-
-```
-project/
-├── index.html                 # Страница авторизации
-├── register.html              # Страница регистрации
-├── in.html                    # Главная страница
-├── in-exp.html                # Доходы и расходы
-├── in-add.html / in-edit.html # Создание / редактирование операции
-├── exp.html                   # Категории доходов
-├── exp-add.html / exp-edit.html # Создание / редактирование категории дохода
-├── in-exp-create.html / in-exp-edit.html # Аналогично для расходов
-├── assets/
-│   ├── css/
-│   ├── js/
-│   └── img/
-├── README.md
-└── .gitignore
-```
