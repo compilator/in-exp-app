@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Расходы - добавить категорию</title>
+    <title>Личный кабинет</title>
     <link rel="stylesheet" href="styles/style.css">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -19,7 +20,7 @@
     <div class="offcanvas-body">
         <ul class="nav nav-pills flex-column mb-auto">
             <li class="nav-item">
-                <a href="index.html" class="nav-link">
+                <a href="#/" class="nav-link active" data-spa-link aria-current="page">
                     <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 12.3964V5.89641H2.5V12.3964C2.5 12.6726 2.72386 12.8964 3 12.8964H12C12.2761 12.8964 12.5 12.6726 12.5 12.3964V5.89641H13.5V12.3964C13.5 13.2248 12.8284 13.8964 12 13.8964H3C2.17157 13.8964 1.5 13.2248 1.5 12.3964Z" fill="#052C65"/>
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M12.5 1.39641V4.89641L10.5 2.89641V1.39641C10.5 1.12027 10.7239 0.896409 11 0.896409H12C12.2761 0.896409 12.5 1.12027 12.5 1.39641Z" fill="#052C65"/>
@@ -29,7 +30,7 @@
                 </a>
             </li>
             <li>
-                <a href="in-exp.html" class="nav-link link-dark">
+                <a href="#/operations" class="nav-link link-dark" data-spa-link>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M11 15C13.2091 15 15 13.2091 15 11C15 8.79086 13.2091 7 11 7C8.79086 7 7 8.79086 7 11C7 13.2091 8.79086 15 11 15ZM16 11C16 13.7614 13.7614 16 11 16C8.23858 16 6 13.7614 6 11C6 8.23858 8.23858 6 11 6C13.7614 6 16 8.23858 16 11Z" fill="#052C65"/>
                         <path d="M9.4375 11.9444C9.48519 12.5403 9.95568 13.0049 10.8013 13.0599V13.5H11.1764V13.0568C12.0507 12.9957 12.5625 12.5281 12.5625 11.8496C12.5625 11.2323 12.1715 10.9144 11.4721 10.7494L11.1764 10.6791V9.48105C11.5516 9.52384 11.79 9.72861 11.8472 10.0128H12.5053C12.4576 9.43826 11.9648 8.989 11.1764 8.9401V8.5H10.8013V8.94927C10.0542 9.02262 9.54559 9.47188 9.54559 10.1076C9.54559 10.6699 9.92389 11.0275 10.5533 11.1742L10.8013 11.2353V12.5067C10.4166 12.4487 10.1623 12.2378 10.1051 11.9444H9.4375ZM10.7981 10.5905C10.4294 10.5049 10.2291 10.3307 10.2291 10.0678C10.2291 9.77445 10.4453 9.5544 10.8013 9.49022V10.5905H10.7981ZM11.2305 11.3362C11.6787 11.4401 11.8854 11.6082 11.8854 11.9046C11.8854 12.2439 11.6279 12.4762 11.1764 12.5189V11.324L11.2305 11.3362Z" fill="#052C65"/>
@@ -53,24 +54,27 @@
                     </span>
                 </button>
                 <div class="dropdown-menu shadow-sm mt-1 p-2 w-100" id="categoryDropdownMenuMobile">
-                    <a href="in.html" class="dropdown-item active">Доходы</a>
-                    <a href="exp.html" class="dropdown-item">Расходы</a>
+                    <a href="#/income" class="dropdown-item" data-spa-link>Доходы</a>
+                    <a href="#/expense" class="dropdown-item" data-spa-link>Расходы</a>
                 </div>
+            </li>
+            <li class="nav-item mt-2 px-2 w-100">
+                <button type="button" class="btn btn-outline-secondary w-100 js-logout">Выйти</button>
             </li>
         </ul>
     </div>
 </div>
 
 <div class="d-flex flex-column flex-shrink-0 p-3 bg-light">
-    
+
     <div class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
         <div class="logo d-flex align-items-center gap-2">
-            <a href="/"><img src="images/Logo.png" alt="Logo" style="height: 40px;" class="logos"></a>
-            
+            <a href="#/" data-spa-link><img src="images/Logo.png" alt="Logo" style="height: 40px;" class="logos"></a>
+
             <div class="burger d-md-none" id="burger">
-                <button class="btn btn-link p-0 border-0" 
-                        type="button" 
-                        data-bs-toggle="offcanvas" 
+                <button class="btn btn-link p-0 border-0"
+                        type="button"
+                        data-bs-toggle="offcanvas"
                         data-bs-target="#mobileMenu"
                         aria-controls="mobileMenu">
                     <img src="images/burger.svg" alt="Menu" class="burger-icon" style="width: 24px; height: 24px;">
@@ -78,12 +82,12 @@
             </div>
         </div>
     </div>
-    
-    <hr> 
+
+    <hr>
 
     <ul class="nav nav-pills flex-column mb-auto d-none d-md-flex">
         <li class="nav-item">
-            <a href="index.html" class="nav-link link-dark">
+            <a href="#/" class="nav-link active" data-spa-link aria-current="page">
                 <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 12.3964V5.89641H2.5V12.3964C2.5 12.6726 2.72386 12.8964 3 12.8964H12C12.2761 12.8964 12.5 12.6726 12.5 12.3964V5.89641H13.5V12.3964C13.5 13.2248 12.8284 13.8964 12 13.8964H3C2.17157 13.8964 1.5 13.2248 1.5 12.3964Z" fill="#052C65"/>
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M12.5 1.39641V4.89641L10.5 2.89641V1.39641C10.5 1.12027 10.7239 0.896409 11 0.896409H12C12.2761 0.896409 12.5 1.12027 12.5 1.39641Z" fill="#052C65"/>
@@ -93,7 +97,7 @@
             </a>
         </li>
         <li>
-            <a href="in-exp.html" class="nav-link link-dark">
+            <a href="#/operations" class="nav-link link-dark" data-spa-link>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd" clip-rule="evenodd" d="M11 15C13.2091 15 15 13.2091 15 11C15 8.79086 13.2091 7 11 7C8.79086 7 7 8.79086 7 11C7 13.2091 8.79086 15 11 15ZM16 11C16 13.7614 13.7614 16 11 16C8.23858 16 6 13.7614 6 11C6 8.23858 8.23858 6 11 6C13.7614 6 16 8.23858 16 11Z" fill="#052C65"/>
                     <path d="M9.4375 11.9444C9.48519 12.5403 9.95568 13.0049 10.8013 13.0599V13.5H11.1764V13.0568C12.0507 12.9957 12.5625 12.5281 12.5625 11.8496C12.5625 11.2323 12.1715 10.9144 11.4721 10.7494L11.1764 10.6791V9.48105C11.5516 9.52384 11.79 9.72861 11.8472 10.0128H12.5053C12.4576 9.43826 11.9648 8.989 11.1764 8.9401V8.5H10.8013V8.94927C10.0542 9.02262 9.54559 9.47188 9.54559 10.1076C9.54559 10.6699 9.92389 11.0275 10.5533 11.1742L10.8013 11.2353V12.5067C10.4166 12.4487 10.1623 12.2378 10.1051 11.9444H9.4375ZM10.7981 10.5905C10.4294 10.5049 10.2291 10.3307 10.2291 10.0678C10.2291 9.77445 10.4453 9.5544 10.8013 9.49022V10.5905H10.7981ZM11.2305 11.3362C11.6787 11.4401 11.8854 11.6082 11.8854 11.9046C11.8854 12.2439 11.6279 12.4762 11.1764 12.5189V11.324L11.2305 11.3362Z" fill="#052C65"/>
@@ -103,11 +107,11 @@
                 Доходы & Расходы
             </a>
         </li>
-        <li class="nav-item dropdown mb-1 dropdown-has-active">
+        <li class="nav-item dropdown mb-1">
             <button class="btn d-inline-flex align-items-center rounded collapsed dropdown-toggle"
                     type="button"
                     data-bs-toggle="dropdown"
-                    aria-expanded="true"
+                    aria-expanded="false"
                     id="categoryDropdownBtn">
                 <span>Категории</span>
                 <span class="arrow ms-auto">
@@ -116,42 +120,36 @@
                     </svg>
                 </span>
             </button>
-            <div class="dropdown-menu shadow-sm mt-1 p-2 show" id="categoryDropdownMenu">
-                <a href="in.html" class="dropdown-item active"  aria-current="page">Доходы</a>
-                <a href="exp.html" class="dropdown-item">Расходы</a>
+            <div class="dropdown-menu shadow-sm mt-1 p-2" id="categoryDropdownMenu">
+                <a href="#/income" class="dropdown-item" data-spa-link>Доходы</a>
+                <a href="#/expense" class="dropdown-item" data-spa-link>Расходы</a>
             </div>
         </li>
     </ul>
 
     <div class="balance mb-2">
-        <strong>Баланс:</strong> <span class="text-primary">500</span>
+        <strong>Баланс:</strong> <span class="text-primary">0</span> ₽
     </div>
-    
+
     <hr>
 
     <div class="profile d-flex align-items-center gap-2">
         <div class="avatar">
             <img src="images/profile.svg" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
         </div>
-        <div class="name fw-medium d-md-block">Roman Chernov</div>
-    </div>
-</div>
-    <div class="content flex-grow-1">
-        <h1>Создание категории расходов</h1>
-        <div class="form-container">
-        <div class="mb-3">
-            <input type="text" class="form-control" placeholder="Название..." id="nameInput">
-        </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-create">Создать</button>
-            <button type="button" class="btn btn-cancel" onclick="history.back()">Отмена</button>
-        </div>
+        <div class="name fw-medium d-md-block user-name">—</div>
+        <div class="logout">
+            <button type="button" class="btn btn-link nav-link link-dark p-0 text-decoration-none js-logout">Выйти</button>
         </div>
     </div>
 </div>
-</div> 
+    <div id="main-content" class="content flex-grow-1"></div>
+</div>
+</div>
 
-<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
-<script src="scripts/scripts.js"></script>
+  <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="scripts/api.js"></script>
+  <script type="module" src="scripts/app.js"></script>
 </body>
 </html>

@@ -12,7 +12,7 @@ new Chart(incomeCtx, {
     data: {
         labels: ['Red', 'Orange', 'Yellow', 'Green', 'Blue'],
         datasets: [{
-            data: [30, 35, 15, 12, 8], // Ваши данные
+            data: [30, 35, 15, 12, 8],
             backgroundColor: [
                 colors.red,
                 colors.orange,

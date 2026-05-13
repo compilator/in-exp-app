@@ -1,5 +1,6 @@
-node_modules/
-.DS_Store
-.idea/
-*.log
-npm-debug.log*
+backend/
+frontend/node_modules/
+frontend/.DS_Store
+frontend/.idea/
+frontend/*.log
+frontend/npm-debug.log*
