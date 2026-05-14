@@ -1,5 +1,10 @@
+dist/
 node_modules/
-.DS_Store
-.idea/
-*.log
-npm-debug.log*
+backend/node_modules/
+frontend/node_modules/
+frontend/.DS_Store
+frontend/.idea/
+frontend/*.log
+frontend/npm-debug.log*
+frontend/.DS_Store
+.idea/workspace.xml
