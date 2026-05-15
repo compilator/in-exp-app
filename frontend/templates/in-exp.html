@@ -1,0 +1,40 @@
+<h1>Доходы и расходы</h1>
+<div class="buttons mb-3">
+    <button type="button" class="btn btn-confirm-yes" onclick="window.router && window.router.navigate('/income/add')">Создать доход</button>
+    <button type="button" class="btn btn-confirm-no" onclick="window.router && window.router.navigate('/expense/add')">Создать расход</button>
+</div>
+<div class="buttons mb-3">
+    <button class="btn btn-secondary" type="button">Сегодня</button>
+    <button class="btn btn-outline-secondary" type="button">Неделя</button>
+    <button class="btn btn-outline-secondary" type="button">Месяц</button>
+    <button class="btn btn-outline-secondary" type="button">Год</button>
+    <button class="btn btn-outline-secondary" type="button">Все</button>
+    <button class="btn btn-outline-secondary" type="button">Интервал</button>
+    с <a href="#" class="date">Дата</a> по <a href="#" class="date">Дата</a>
+</div>
+<div class="content-inner">
+    <table class="operations-table">
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Категория</th>
+                <th>Сумма</th>
+                <th>Комментарий</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="modal fade modal-confirm" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body"><p class="mb-0">Вы действительно хотите удалить операцию?</p></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-confirm-yes" id="confirmDeleteBtn">Да, удалить</button>
+                <button type="button" class="btn btn-confirm-no" data-bs-dismiss="modal">Не удалять</button>
+            </div>
+        </div>
+    </div>
+</div>
