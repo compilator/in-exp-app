@@ -3,14 +3,17 @@
     <button type="button" class="btn btn-confirm-yes" onclick="window.router && window.router.navigate('/income/add')">Создать доход</button>
     <button type="button" class="btn btn-confirm-no" onclick="window.router && window.router.navigate('/expense/add')">Создать расход</button>
 </div>
-<div class="buttons mb-3">
-    <button class="btn btn-secondary" type="button">Сегодня</button>
-    <button class="btn btn-outline-secondary" type="button">Неделя</button>
-    <button class="btn btn-outline-secondary" type="button">Месяц</button>
-    <button class="btn btn-outline-secondary" type="button">Год</button>
-    <button class="btn btn-outline-secondary" type="button">Все</button>
-    <button class="btn btn-outline-secondary" type="button">Интервал</button>
-    с <a href="#" class="date">Дата</a> по <a href="#" class="date">Дата</a>
+<div class="buttons js-period-filters mb-3">
+    <button class="btn btn-secondary js-period-btn" type="button" data-period="today">Сегодня</button>
+    <button class="btn btn-outline-secondary js-period-btn" type="button" data-period="week">Неделя</button>
+    <button class="btn btn-outline-secondary js-period-btn" type="button" data-period="month">Месяц</button>
+    <button class="btn btn-outline-secondary js-period-btn" type="button" data-period="year">Год</button>
+    <button class="btn btn-outline-secondary js-period-btn" type="button" data-period="all">Все</button>
+    <button class="btn btn-outline-secondary js-period-btn" type="button" data-period="interval">Интервал</button>
+    <span class="js-interval-dates interval-dates d-none">
+        с <input type="date" class="date js-date-from" aria-label="Дата с">
+        по <input type="date" class="date js-date-to" aria-label="Дата по">
+    </span>
 </div>
 <div class="content-inner">
     <table class="operations-table">

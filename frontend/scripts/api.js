@@ -1,4 +1,6 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+/* global __API_BASE_URL__ */
+const API_BASE_URL =
+  typeof __API_BASE_URL__ !== 'undefined' ? __API_BASE_URL__ : 'http://localhost:3000/api';
 
 async function getErrorMessage(response) {
   try {
@@ -9,12 +11,22 @@ async function getErrorMessage(response) {
   }
 }
 
+function unwrapTokens(payload) {
+  if (payload && payload.tokens) {
+    return {
+      accessToken: payload.tokens.accessToken,
+      refreshToken: payload.tokens.refreshToken,
+    };
+  }
+  return payload;
+}
+
 const api = {
   async login(email, password, rememberMe = false) {
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, rememberMe })
+      body: JSON.stringify({ email, password, rememberMe }),
     });
 
     if (!response.ok) {
@@ -28,7 +40,7 @@ const api = {
     const response = await fetch(`${API_BASE_URL}/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, lastName, email, password, passwordRepeat })
+      body: JSON.stringify({ name, lastName, email, password, passwordRepeat }),
     });
 
     if (!response.ok) {
@@ -43,7 +55,7 @@ const api = {
       const response = await fetch(`${API_BASE_URL}/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refreshToken })
+        body: JSON.stringify({ refreshToken }),
       });
       return response.ok;
     } catch {
@@ -54,32 +66,58 @@ const api = {
   async refresh(refreshToken) {
     if (!refreshToken) throw new Error('Refresh token отсутствует');
 
+    let rememberMe = false;
+    try {
+      rememberMe = localStorage.getItem('rememberMe') === '1';
+    } catch {
+      /* ignore */
+    }
+
     const response = await fetch(`${API_BASE_URL}/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken })
+      body: JSON.stringify({ refreshToken, rememberMe }),
     });
 
     if (!response.ok) {
       const message = await getErrorMessage(response);
       throw new Error(message);
     }
-    return await response.json();
+    const data = await response.json();
+    return unwrapTokens(data);
   },
 
-  async getBalance(token) {
-    if (!token) throw new Error('Токен отсутствует');
+  async getBalance() {
+    return this.request('/balance', { method: 'GET' });
+  },
 
-    const response = await fetch(`${API_BASE_URL}/balance`, {
-      method: 'GET',
-      headers: { 'x-auth-token': token }
+  async updateBalance(newBalance) {
+    return this.request('/balance', {
+      method: 'PUT',
+      body: JSON.stringify({ newBalance }),
     });
+  },
 
-    if (!response.ok) {
-      const message = await getErrorMessage(response);
-      throw new Error(message);
-    }
-    return await response.json();
+  async getCategories(type) {
+    return this.request(`/categories/${type}`, { method: 'GET' });
+  },
+
+  async createCategory(type, title) {
+    return this.request(`/categories/${type}`, {
+      method: 'POST',
+      body: JSON.stringify({ title }),
+    });
+  },
+
+  async getCategory(type, id) {
+    return this.request(`/categories/${type}/${id}`, { method: 'GET' });
+  },
+
+  async updateCategory(type, id, title) {
+    return this.request(`/categories/${type}/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ title }),
+    });
   },
 
   async request(url, options = {}) {
@@ -91,8 +129,8 @@ const api = {
       headers: {
         'Content-Type': 'application/json',
         'x-auth-token': token,
-        ...options.headers
-      }
+        ...options.headers,
+      },
     };
 
     let response = await fetch(`${API_BASE_URL}${url}`, config);
@@ -130,6 +168,7 @@ const api = {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    localStorage.removeItem('rememberMe');
     localStorage.removeItem('redirectAfterLogin');
 
     if (refreshToken) {
@@ -167,7 +206,7 @@ const api = {
     } catch {
       /* ignore */
     }
-  }
+  },
 };
 
 window.api = api;
