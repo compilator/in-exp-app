@@ -15,3 +15,25 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade modal-confirm" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-semibold" id="addCategoryModalLabel">Новая категория</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body pt-2">
+                <form id="addCategoryForm" novalidate>
+                    <label class="form-label" for="addCategoryTitle">Название</label>
+                    <input type="text" class="form-control" id="addCategoryTitle" maxlength="120" placeholder="Введите название" autocomplete="off">
+                    <div class="invalid-feedback">Укажите название категории</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-create" id="addCategorySubmitBtn">Создать</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>

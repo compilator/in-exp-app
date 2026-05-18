@@ -46,6 +46,7 @@ function initLogin() {
       if (accessToken) {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken || '');
+        localStorage.setItem('rememberMe', rememberMeCheckbox?.checked ? '1' : '0');
         if (data.user) {
           localStorage.setItem('user', JSON.stringify(data.user));
         }

@@ -1,10 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = (env, argv) => {
   const isProd = argv.mode === 'production';
+  const apiBaseUrl = isProd ? 'http://localhost:3000/api' : '/api';
 
   return {
     context: __dirname,
@@ -52,6 +54,9 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        __API_BASE_URL__: JSON.stringify(apiBaseUrl),
+      }),
       ...(isProd
         ? [
             new MiniCssExtractPlugin({
@@ -89,6 +94,12 @@ module.exports = (env, argv) => {
       port: 8080,
       hot: true,
       historyApiFallback: { index: '/index.html' },
+      proxy: [
+        {
+          context: ['/api'],
+          target: 'http://localhost:3000',
+        },
+      ],
     },
     devtool: isProd ? 'source-map' : 'eval-source-map',
   };
