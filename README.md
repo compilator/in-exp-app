@@ -1,4 +1,4 @@
-# 📘 in-exp-app
+# ![Alt text](https://raw.githubusercontent.com/compilator/in-exp-app/5c0ba75972b0779ff490a958e88405b423c6da9f/frontend/images/Logo!.svg)
 
 Полноценное fullstack-приложение для учёта финансов (доходы/расходы). Архитектура разделена на независимые модули: **Backend** (REST API на Node.js) и **Frontend** (клиентская часть, собираемая через Webpack 5).
 
