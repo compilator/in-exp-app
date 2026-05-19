@@ -1,11 +1,11 @@
 export const TEMPLATES_DIR = 'templates';
 
-export function templateUrl(file) {
+export function templateUrl(file: string): string {
   const name = String(file).replace(/^\/+/, '');
   return `${TEMPLATES_DIR}/${name}`;
 }
 
-export function extractTemplateMainContent(html) {
+export function extractTemplateMainContent(html: string): string {
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const main =
     doc.querySelector('.layout .content.flex-grow-1') ||
@@ -22,7 +22,7 @@ export function extractTemplateMainContent(html) {
   return doc.body.innerHTML.trim();
 }
 
-export function normalizeRoutePath(path) {
+export function normalizeRoutePath(path: string | null | undefined): string {
   let p = String(path ?? '').trim();
   if (p.startsWith('#')) p = p.slice(1);
   if (!p || p === '/') return '/';
@@ -30,42 +30,51 @@ export function normalizeRoutePath(path) {
   return p.replace(/\/+/g, '/') || '/';
 }
 
-export class Router {
-  constructor() {
-    this.routes = [];
-    this._handling = false;
-  }
+type RouteHandler = (params: string[]) => void | Promise<void>;
 
-  addRoute(path, handler, requiresAuth = true) {
+interface RouteDefinition {
+  path: string;
+  handler: RouteHandler;
+  requiresAuth: boolean;
+  regex: RegExp | null;
+}
+
+interface MatchedRoute extends RouteDefinition {
+  params: string[];
+}
+
+export class Router {
+  routes: RouteDefinition[] = [];
+  private _handling = false;
+
+  addRoute(path: string, handler: RouteHandler, requiresAuth = true): void {
     this.routes.push({
       path,
       handler,
       requiresAuth,
-      regex: path.includes(':')
-        ? new RegExp(`^${path.replace(/:\w+/g, '(\\d+)')}$`)
-        : null,
+      regex: path.includes(':') ? new RegExp(`^${path.replace(/:\w+/g, '(\\d+)')}$`) : null,
     });
   }
 
-  getPath() {
+  getPath(): string {
     const hash = window.location.hash.slice(1);
     return hash ? normalizeRoutePath(hash) : '/';
   }
 
-  navigate(path) {
+  navigate(path: string): void {
     const targetPath = normalizeRoutePath(path);
     const hash = `#${targetPath}`;
 
     if (this.getPath() === targetPath) {
-      this.handleRoute();
+      void this.handleRoute();
     } else {
       window.location.hash = hash;
     }
   }
 
-  matchRoute(path) {
-    let route = this.routes.find((r) => r.path === path);
-    if (route) return { ...route, params: [] };
+  matchRoute(path: string): MatchedRoute | null {
+    const exact = this.routes.find((r) => r.path === path);
+    if (exact) return { ...exact, params: [] };
 
     for (const route of this.routes) {
       if (route.regex) {
@@ -78,7 +87,7 @@ export class Router {
     return null;
   }
 
-  async handleRoute() {
+  async handleRoute(): Promise<void> {
     if (this._handling) return;
     this._handling = true;
     try {
@@ -112,10 +121,10 @@ export class Router {
     }
   }
 
-  init() {
-    window.addEventListener('hashchange', () => this.handleRoute());
+  init(): void {
+    window.addEventListener('hashchange', () => void this.handleRoute());
     window.addEventListener('load', () => {
-      setTimeout(() => this.handleRoute(), 50);
+      setTimeout(() => void this.handleRoute(), 50);
     });
   }
 }

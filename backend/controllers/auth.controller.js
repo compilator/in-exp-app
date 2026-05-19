@@ -26,7 +26,7 @@ class AuthController {
                     .json({error: true, message: "User with given email already exist"});
             }
 
-            const salt = await bcrypt.genSalt(Number('example'));
+            const salt = await bcrypt.genSalt(10);
             const hashPassword = await bcrypt.hash(req.body.password, salt);
 
             let id = 1;

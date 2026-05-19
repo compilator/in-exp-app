@@ -1,36 +1,54 @@
 const TAFFY = require('taffy');
-const categories = TAFFY(require('../data/categories-income-initial.json'));
+const db = require('../utils/db.utils');
+
+const COLLECTION = 'categoriesIncome';
+let categories = null;
+
+function getStore() {
+  if (!categories) {
+    categories = TAFFY(db.get(COLLECTION));
+  }
+  return categories;
+}
+
+function persist() {
+  db.set(COLLECTION, db.exportTaffy(getStore()));
+}
 
 class CategoryIncomeModel {
-    static findAll(userId) {
-        return categories({user_id: userId}).get();
-    }
+  static findAll(userId) {
+    return getStore()({ user_id: userId }).get();
+  }
 
-    static findOne(params) {
-        return categories(params).first();
-    }
+  static findOne(params) {
+    return getStore()(params).first();
+  }
 
-    static create(data) {
-        return categories.insert(data);
-    }
+  static create(data) {
+    const result = getStore().insert(data);
+    persist();
+    return result;
+  }
 
-    static update(params, title) {
-        const category = categories(params);
-        if (category) {
-            category.update({title: title});
+  static update(params, title) {
+    const category = getStore()(params);
+    if (category) {
+      category.update({ title: title });
 
-            const updatedCategory = category.first();
-            return {
-                id: updatedCategory.id,
-                title: updatedCategory.title
-            };
-        }
-        return null;
+      const updatedCategory = category.first();
+      persist();
+      return {
+        id: updatedCategory.id,
+        title: updatedCategory.title,
+      };
     }
+    return null;
+  }
 
-    static delete(filter) {
-        return categories(filter).remove();
-    }
+  static delete(filter) {
+    getStore()(filter).remove();
+    persist();
+  }
 }
 
 module.exports = CategoryIncomeModel;

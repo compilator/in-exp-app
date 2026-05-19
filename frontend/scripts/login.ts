@@ -1,9 +1,10 @@
 import '../styles/style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
-import './api.js';
+import './api';
+import type { AuthTokens, LoginResponse } from './types/models';
 
-function navigateToAppAfterLogin() {
+function navigateToAppAfterLogin(): void {
   let path = localStorage.getItem('redirectAfterLogin');
   localStorage.removeItem('redirectAfterLogin');
   if (!path || path === '/login' || path === '/register' || path === '/logout') {
@@ -16,14 +17,14 @@ function navigateToAppAfterLogin() {
   window.location.assign(entry.href);
 }
 
-function initLogin() {
+function initLogin(): void {
   if (window.__loginInitialized) return;
   window.__loginInitialized = true;
 
   const loginForm = document.querySelector('form');
-  const emailInput = document.querySelector('#floatingInput');
-  const passwordInput = document.querySelector('#floatingPassword');
-  const rememberMeCheckbox = document.querySelector('#checkDefault');
+  const emailInput = document.querySelector('#floatingInput') as HTMLInputElement | null;
+  const passwordInput = document.querySelector('#floatingPassword') as HTMLInputElement | null;
+  const rememberMeCheckbox = document.querySelector('#checkDefault') as HTMLInputElement | null;
 
   if (!loginForm || !emailInput || !passwordInput) {
     return;
@@ -39,9 +40,9 @@ function initLogin() {
         rememberMeCheckbox?.checked || false
       );
 
-      const tokens = data.tokens || data;
-      const accessToken = tokens.accessToken;
-      const refreshToken = tokens.refreshToken;
+      const tokens: AuthTokens | LoginResponse = data.tokens ?? data;
+      const accessToken = 'accessToken' in tokens ? tokens.accessToken : undefined;
+      const refreshToken = 'refreshToken' in tokens ? tokens.refreshToken : undefined;
 
       if (accessToken) {
         localStorage.setItem('accessToken', accessToken);
@@ -55,7 +56,8 @@ function initLogin() {
         throw new Error('Сервер не вернул accessToken');
       }
     } catch (err) {
-      alert('Ошибка: ' + err.message);
+      const message = err instanceof Error ? err.message : 'Ошибка входа';
+      alert('Ошибка: ' + message);
     }
   });
 }

@@ -3,17 +3,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
-import './api.js';
-import { router, templateUrl, extractTemplateMainContent } from './router.js';
+import './api';
+import { router, templateUrl, extractTemplateMainContent } from './router';
+import type {
+  Category,
+  CategoryType,
+  DeleteModalState,
+  Operation,
+  OperationType,
+  OperationsFilter,
+} from './types/models';
+import { getOperationFormValues, qs, replaceFormElement } from './dom';
 
 async function initApp() {
   registerRoutes();
 
   document.body.addEventListener('click', (e) => {
+    const target = e.target;
+    if (!(target instanceof Element)) return;
+
     const menu = document.getElementById('mobileMenu');
     const inst = menu && bootstrap.Offcanvas.getInstance(menu);
 
-    if (e.target.closest('.js-logout')) {
+    if (target.closest('.js-logout')) {
       e.preventDefault();
       e.stopPropagation();
       if (inst) inst.hide();
@@ -21,16 +33,16 @@ async function initApp() {
       return;
     }
 
-    if (e.target.closest('a[data-spa-link]') && inst) {
+    if (target.closest('a[data-spa-link]') && inst) {
       inst.hide();
     }
 
-    if (e.target.closest('#addCategorySubmitBtn')) {
+    if (target.closest('#addCategorySubmitBtn')) {
       e.preventDefault();
       submitAddCategoryModal();
     }
 
-    if (e.target.closest('#confirmDeleteBtn')) {
+    if (target.closest('#confirmDeleteBtn')) {
       e.preventDefault();
       if (deleteModalState.operationId) {
         confirmDeleteOperation();
@@ -41,23 +53,25 @@ async function initApp() {
   });
 
   document.body.addEventListener('submit', (e) => {
-    if (e.target.id === 'addCategoryForm') {
+    const form = e.target;
+    if (form instanceof HTMLFormElement && form.id === 'addCategoryForm') {
       e.preventDefault();
       submitAddCategoryModal();
     }
   });
 
   document.body.addEventListener('input', (e) => {
-    if (e.target.id === 'addCategoryTitle') {
-      e.target.classList.remove('is-invalid');
+    const input = e.target;
+    if (input instanceof HTMLInputElement && input.id === 'addCategoryTitle') {
+      input.classList.remove('is-invalid');
     }
   });
 
   document.body.addEventListener('hidden.bs.modal', (e) => {
-    if (e.target && e.target.id === 'addCategoryModal') {
+    if (e.target instanceof HTMLElement && e.target.id === 'addCategoryModal') {
       document.getElementById('addCategoryTitle')?.classList.remove('is-invalid');
     }
-    if (e.target && e.target.id === 'deleteModal') {
+    if (e.target instanceof HTMLElement && e.target.id === 'deleteModal') {
       deleteModalState.type = null;
       deleteModalState.id = null;
       deleteModalState.operationId = null;
@@ -65,31 +79,35 @@ async function initApp() {
   });
 
   document.body.addEventListener('show.bs.modal', (e) => {
-    if (e.target?.id !== 'deleteModal') return;
+    if (!(e.target instanceof HTMLElement) || e.target.id !== 'deleteModal') return;
     const trigger = e.relatedTarget;
-    if (!trigger) return;
+    if (!(trigger instanceof HTMLElement)) return;
     deleteModalState.operationId = trigger.getAttribute('data-operation-id');
-    deleteModalState.type = trigger.getAttribute('data-category-type');
+    deleteModalState.type = trigger.getAttribute('data-category-type') as CategoryType | null;
     deleteModalState.id = trigger.getAttribute('data-category-id');
   });
 
   const mainContent = document.getElementById('main-content');
   if (mainContent) {
     mainContent.addEventListener('click', (e) => {
-      const btn = e.target.closest('.js-period-btn');
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      const btn = target.closest('.js-period-btn') as HTMLButtonElement | null;
       if (!btn) return;
       e.preventDefault();
       const container = btn.closest('.js-period-filters');
-      setOperationsFilterPeriod(btn.dataset.period, container);
+      setOperationsFilterPeriod(btn.dataset.period || 'today', container);
     });
 
     mainContent.addEventListener('change', (e) => {
-      if (!e.target.matches('.js-date-from, .js-date-to')) return;
-      const container = e.target.closest('.js-period-filters');
+      const input = e.target;
+      if (!(input instanceof HTMLInputElement)) return;
+      if (!input.matches('.js-date-from, .js-date-to')) return;
+      const container = input.closest('.js-period-filters');
       if (!container || window.operationsFilter.period !== 'interval') return;
 
-      const dateFrom = container.querySelector('.js-date-from')?.value || '';
-      const dateTo = container.querySelector('.js-date-to')?.value || '';
+      const dateFrom = qs<HTMLInputElement>('.js-date-from', container)?.value || '';
+      const dateTo = qs<HTMLInputElement>('.js-date-to', container)?.value || '';
       window.operationsFilter.dateFrom = dateFrom;
       window.operationsFilter.dateTo = dateTo;
 
@@ -102,20 +120,20 @@ async function initApp() {
   router.init();
 }
 
-const deleteModalState = { type: null, id: null, operationId: null };
+const deleteModalState: DeleteModalState = { type: null, id: null, operationId: null };
 
-window.operationsFilter = { period: 'today', dateFrom: '', dateTo: '' };
+window.operationsFilter = { period: 'today', dateFrom: '', dateTo: '' } satisfies OperationsFilter;
 
-function formatDateInputValue(date) {
+function formatDateInputValue(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
-function getOperationsFilterParams() {
+function getOperationsFilterParams(): Record<string, string> {
   const { period, dateFrom, dateTo } = window.operationsFilter;
-  const params = { period };
+  const params: Record<string, string> = { period };
   if (period === 'interval' && dateFrom && dateTo) {
     params.dateFrom = dateFrom;
     params.dateTo = dateTo;
@@ -125,14 +143,14 @@ function getOperationsFilterParams() {
 
 window.getOperationsFilterParams = getOperationsFilterParams;
 
-function syncPeriodFilterUI(container) {
+function syncPeriodFilterUI(container: Element | null | undefined) {
   if (!container) {
     container = document.querySelector('#main-content .js-period-filters');
   }
   if (!container) return;
 
   const { period } = window.operationsFilter;
-  container.querySelectorAll('.js-period-btn').forEach((btn) => {
+  container.querySelectorAll<HTMLButtonElement>('.js-period-btn').forEach((btn) => {
     const active = btn.dataset.period === period;
     btn.classList.toggle('btn-secondary', active);
     btn.classList.toggle('btn-outline-secondary', !active);
@@ -143,16 +161,16 @@ function syncPeriodFilterUI(container) {
     intervalDates.classList.toggle('d-none', period !== 'interval');
   }
 
-  const from = container.querySelector('.js-date-from');
-  const to = container.querySelector('.js-date-to');
-  if (from && window.operationsFilter.dateFrom) from.value = window.operationsFilter.dateFrom;
-  if (to && window.operationsFilter.dateTo) to.value = window.operationsFilter.dateTo;
+  const fromEl = qs<HTMLInputElement>('.js-date-from', container);
+  const toEl = qs<HTMLInputElement>('.js-date-to', container);
+  if (fromEl && window.operationsFilter.dateFrom) fromEl.value = window.operationsFilter.dateFrom;
+  if (toEl && window.operationsFilter.dateTo) toEl.value = window.operationsFilter.dateTo;
 }
 
-function initPeriodFilterDates(container) {
+function initPeriodFilterDates(container: Element | null | undefined) {
   if (!container) return;
-  const from = container.querySelector('.js-date-from');
-  const to = container.querySelector('.js-date-to');
+  const from = qs<HTMLInputElement>('.js-date-from', container);
+  const to = qs<HTMLInputElement>('.js-date-to', container);
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -166,7 +184,7 @@ function initPeriodFilterDates(container) {
   window.operationsFilter.dateTo = to?.value || '';
 }
 
-function setOperationsFilterPeriod(period, container) {
+function setOperationsFilterPeriod(period: string, container: Element | null | undefined) {
   window.operationsFilter.period = period;
   if (period === 'interval') {
     initPeriodFilterDates(container);
@@ -215,7 +233,7 @@ function handleLogoutRoute() {
   window.api?.performLogout?.();
 }
 
-function mergeHeadAssetsFromDoc(doc) {
+function mergeHeadAssetsFromDoc(doc: Document) {
   doc.querySelectorAll('head link[rel="stylesheet"]').forEach((link) => {
     const href = link.getAttribute('href');
     if (!href) return;
@@ -226,7 +244,7 @@ function mergeHeadAssetsFromDoc(doc) {
   });
 }
 
-function loadScript(src, onLoad) {
+function loadScript(src: string, onLoad?: () => void) {
   document.querySelectorAll('script[data-spa-chunk]').forEach((el) => el.remove());
 
   const script = document.createElement('script');
@@ -281,7 +299,7 @@ async function loadIncomeAddPage() {
   initOperationForm('income');
 }
 
-async function loadIncomeEditPage(params) {
+async function loadIncomeEditPage(params: string[]) {
   const id = params?.[0];
   await loadPageWithLayout('in-edit.html');
   initOperationEditForm('income', id);
@@ -292,13 +310,13 @@ async function loadExpenseAddPage() {
   initOperationForm('expense');
 }
 
-async function loadExpenseEditPage(params) {
+async function loadExpenseEditPage(params: string[]) {
   const id = params?.[0];
   await loadPageWithLayout('exp-edit.html');
   initOperationEditForm('expense', id);
 }
 
-async function loadIncomeCategoryEditPage(params) {
+async function loadIncomeCategoryEditPage(params: string[]) {
   const id = params?.[0];
   await loadPageWithLayout('category-edit.html');
   const h1 = document.querySelector('#category-edit-heading');
@@ -306,7 +324,7 @@ async function loadIncomeCategoryEditPage(params) {
   await initCategoryEditForm('income', id);
 }
 
-async function loadExpenseCategoryEditPage(params) {
+async function loadExpenseCategoryEditPage(params: string[]) {
   const id = params?.[0];
   await loadPageWithLayout('category-edit.html');
   const h1 = document.querySelector('#category-edit-heading');
@@ -314,7 +332,7 @@ async function loadExpenseCategoryEditPage(params) {
   await initCategoryEditForm('expense', id);
 }
 
-async function loadPageWithLayout(contentPage) {
+async function loadPageWithLayout(contentPage: string) {
   try {
     const url = templateUrl(contentPage);
     const response = await fetch(url);
@@ -336,7 +354,7 @@ async function loadPageWithLayout(contentPage) {
   }
 }
 
-async function loadPage(page) {
+async function loadPage(page: string) {
   try {
     const response = await fetch(page);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -359,7 +377,9 @@ function updateActiveNav() {
   const path = router.getPath();
 
   document.querySelectorAll('a[data-spa-link][href^="#"]').forEach((link) => {
-    const routePath = link.getAttribute('href').slice(1);
+    const href = link.getAttribute('href');
+    if (!href) return;
+    const routePath = href.slice(1);
     let active = false;
     if (routePath === '/') {
       active = path === '/' || path === '';
@@ -397,7 +417,7 @@ async function updateLayoutUI() {
 
   document.querySelectorAll('.logout-btn').forEach((logoutBtn) => {
     const newBtn = logoutBtn.cloneNode(true);
-    logoutBtn.parentNode.replaceChild(newBtn, logoutBtn);
+    logoutBtn.parentNode?.replaceChild(newBtn, logoutBtn);
     newBtn.addEventListener('click', (e) => {
       e.preventDefault();
       window.api?.logoutUser?.();
@@ -423,7 +443,7 @@ async function updateBalance() {
   }
 }
 
-function openAddCategoryModal(type) {
+function openAddCategoryModal(type: CategoryType) {
   const modalEl = document.getElementById('addCategoryModal');
   if (!modalEl || !window.bootstrap) return;
 
@@ -433,7 +453,7 @@ function openAddCategoryModal(type) {
     titleEl.textContent = type === 'income' ? 'Новая категория дохода' : 'Новая категория расхода';
   }
 
-  const input = document.getElementById('addCategoryTitle');
+  const input = qs<HTMLInputElement>('#addCategoryTitle');
   if (input) {
     input.value = '';
     input.classList.remove('is-invalid');
@@ -452,8 +472,8 @@ function openAddCategoryModal(type) {
 
 async function submitAddCategoryModal() {
   const modalEl = document.getElementById('addCategoryModal');
-  const type = modalEl?.dataset?.catType;
-  const input = document.getElementById('addCategoryTitle');
+  const type = modalEl?.dataset?.catType as CategoryType | undefined;
+  const input = qs<HTMLInputElement>('#addCategoryTitle');
   if (!type || !modalEl) return;
 
   const title = input?.value?.trim();
@@ -472,30 +492,38 @@ async function submitAddCategoryModal() {
       await loadExpenseCategories();
     }
   } catch (e) {
-    alert(e.message || 'Ошибка создания категории');
+    const message = e instanceof Error ? e.message : 'Ошибка создания категории';
+    alert(message);
   }
 }
 
-function normalizeCategoriesList(data) {
-  if (Array.isArray(data)) return data;
-  if (data && Array.isArray(data.categories)) return data.categories;
+function normalizeCategoriesList(data: unknown): Category[] {
+  if (Array.isArray(data)) return data as Category[];
+  if (
+    data &&
+    typeof data === 'object' &&
+    'categories' in data &&
+    Array.isArray((data as { categories: unknown }).categories)
+  ) {
+    return (data as { categories: Category[] }).categories;
+  }
   return [];
 }
 
-function showCategoriesLoading(type) {
+function showCategoriesLoading(type: CategoryType) {
   const container = document.querySelector('.categories-list');
   if (!container) return;
   const label = type === 'income' ? 'доходов' : 'расходов';
   container.innerHTML = `<p class="text-muted mb-0">Загрузка категорий ${label}…</p>`;
 }
 
-function showCategoriesError(type, message) {
+function showCategoriesError(type: CategoryType, message: string) {
   const container = document.querySelector('.categories-list');
   if (!container) return;
   container.innerHTML = `<p class="text-danger mb-0">${escapeHtml(message)}</p>`;
 }
 
-async function fetchCategoriesFromBackend(type) {
+async function fetchCategoriesFromBackend(type: CategoryType) {
   const data = await window.api.getCategories(type);
   return normalizeCategoriesList(data);
 }
@@ -506,7 +534,8 @@ async function loadIncomeCategories() {
     const categories = await fetchCategoriesFromBackend('income');
     renderCategories(categories, 'income');
   } catch (e) {
-    showCategoriesError('income', e.message || 'Не удалось загрузить категории доходов');
+    const message = e instanceof Error ? e.message : 'Не удалось загрузить категории доходов';
+    showCategoriesError('income', message);
   }
 }
 
@@ -516,25 +545,26 @@ async function loadExpenseCategories() {
     const categories = await fetchCategoriesFromBackend('expense');
     renderCategories(categories, 'expense');
   } catch (e) {
-    showCategoriesError('expense', e.message || 'Не удалось загрузить категории расходов');
+    const message = e instanceof Error ? e.message : 'Не удалось загрузить категории расходов';
+    showCategoriesError('expense', message);
   }
 }
 
-function escapeHtml(text) {
+function escapeHtml(text: unknown) {
   return String(text ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/"/g, '&quot;');
 }
 
-function operationCategoryLabel(op) {
+function operationCategoryLabel(op: Operation | null | undefined) {
   if (op == null) return 'Без категории';
   const c = op.category;
   if (typeof c === 'string') return c || 'Без категории';
   return c?.title || 'Без категории';
 }
 
-function renderCategories(categories, type) {
+function renderCategories(categories: Category[], type: CategoryType) {
   const container = document.querySelector('.categories-list');
   if (!container) return;
 
@@ -589,11 +619,11 @@ async function confirmDeleteCategory() {
   }
 }
 
-async function loadOperations(filter) {
+async function loadOperations(filter?: Record<string, string>) {
   try {
     const params = new URLSearchParams(filter ?? getOperationsFilterParams());
     const operations = await window.api.request(`/operations?${params}`);
-    const list = Array.isArray(operations) ? operations : [];
+    const list = Array.isArray(operations) ? (operations as Operation[]) : [];
     renderOperations(list);
   } catch {
     const tbody = document.querySelector('.operations-table tbody');
@@ -603,7 +633,7 @@ async function loadOperations(filter) {
   }
 }
 
-function renderOperations(operations) {
+function renderOperations(operations: Operation[]) {
   const tbody = document.querySelector('.operations-table tbody');
   if (!tbody) return;
 
@@ -651,38 +681,31 @@ async function confirmDeleteOperation() {
   }
 }
 
-async function initOperationForm(type) {
+async function initOperationForm(type: OperationType) {
   try {
-    const categories = await window.api.getCategories(type);
+    const categories = (await window.api.getCategories(type)) as Category[];
 
-    const categorySelect = document.querySelector('#category');
+    const categorySelect = qs<HTMLSelectElement>('#category');
     if (categorySelect) {
-      categorySelect.innerHTML = categories.map(cat =>
+      categorySelect.innerHTML = categories.map((cat) =>
         `<option value="${cat.id}">${cat.title}</option>`
       ).join('');
     }
 
-    const typeSelect = document.querySelector('#type');
+    const typeSelect = qs<HTMLInputElement>('#type');
     if (typeSelect) {
       typeSelect.value = type;
     }
 
-    const form = document.querySelector('.operation-form');
+    const form = qs<HTMLFormElement>('.operation-form');
     if (!form) return;
 
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
+    const newForm = replaceFormElement(form);
 
     newForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const formData = {
-        type: document.querySelector('#type')?.value,
-        category_id: parseInt(document.querySelector('#category')?.value),
-        amount: parseFloat(document.querySelector('#amount')?.value),
-        date: document.querySelector('#date')?.value,
-        comment: document.querySelector('#comment')?.value || ''
-      };
+      const formData = getOperationFormValues();
 
       try {
         await window.api.request('/operations', {
@@ -693,7 +716,8 @@ async function initOperationForm(type) {
         router.navigate('/operations');
         updateBalance();
       } catch (error) {
-        alert('Ошибка создания операции: ' + error.message);
+        const message = error instanceof Error ? error.message : 'неизвестная ошибка';
+        alert('Ошибка создания операции: ' + message);
       }
     });
   } catch {
@@ -701,50 +725,48 @@ async function initOperationForm(type) {
   }
 }
 
-async function initOperationEditForm(type, id) {
-  try {
-    const operation = await window.api.request(`/operations/${id}`);
+async function initOperationEditForm(type: OperationType, id: string | undefined) {
+  if (!id) return;
 
-    const typeSelect = document.querySelector('#type');
+  try {
+    const operation = (await window.api.request(`/operations/${id}`)) as Operation;
+
+    const typeSelect = qs<HTMLInputElement>('#type');
     if (typeSelect) {
       typeSelect.value = operation.type;
       typeSelect.disabled = true;
     }
 
-    const categories = await window.api.getCategories(operation.type);
-    const categorySelect = document.querySelector('#category');
+    const categories = (await window.api.getCategories(operation.type)) as Category[];
+    const categorySelect = qs<HTMLSelectElement>('#category');
     if (categorySelect) {
       const selectedId = Number(operation.category_id);
-      categorySelect.innerHTML = categories.map(cat =>
+      categorySelect.innerHTML = categories.map((cat) =>
         `<option value="${cat.id}" ${Number(cat.id) === selectedId ? 'selected' : ''}>
           ${cat.title}
         </option>`
       ).join('');
     }
 
-    const amountInput = document.querySelector('#amount');
-    const dateInput = document.querySelector('#date');
-    const commentInput = document.querySelector('#comment');
+    const amountInput = qs<HTMLInputElement>('#amount');
+    const dateInput = qs<HTMLInputElement>('#date');
+    const commentInput = qs<HTMLInputElement>('#comment');
 
-    if (amountInput) amountInput.value = operation.amount || '';
+    if (amountInput) amountInput.value = String(operation.amount ?? '');
     if (dateInput) dateInput.value = operation.date || '';
     if (commentInput) commentInput.value = operation.comment || '';
 
-    const form = document.querySelector('.operation-form');
+    const form = qs<HTMLFormElement>('.operation-form');
     if (!form) return;
 
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
+    const newForm = replaceFormElement(form);
 
     newForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const formData = {
+        ...getOperationFormValues(),
         type: operation.type,
-        category_id: parseInt(document.querySelector('#category')?.value, 10),
-        amount: parseFloat(document.querySelector('#amount')?.value),
-        date: document.querySelector('#date')?.value,
-        comment: document.querySelector('#comment')?.value || ''
       };
 
       try {
@@ -756,7 +778,8 @@ async function initOperationEditForm(type, id) {
         router.navigate('/operations');
         updateBalance();
       } catch (err) {
-        alert('Ошибка сохранения: ' + (err.message || 'неизвестная ошибка'));
+        const message = err instanceof Error ? err.message : 'неизвестная ошибка';
+        alert('Ошибка сохранения: ' + message);
       }
     });
   } catch {
@@ -764,19 +787,22 @@ async function initOperationEditForm(type, id) {
   }
 }
 
-async function initCategoryEditForm(type, id) {
+async function initCategoryEditForm(type: CategoryType, id: string | undefined) {
   const cancelPath = type === 'income' ? '/income' : '/expense';
+  if (!id) {
+    router.navigate(cancelPath);
+    return;
+  }
 
   try {
     const cat = await window.api.getCategory(type, id);
 
-    const form = document.querySelector('.js-category-edit-form');
+    const form = qs<HTMLFormElement>('.js-category-edit-form');
     if (!form) return;
 
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
+    const newForm = replaceFormElement(form);
 
-    const titleInput = document.querySelector('#categoryTitle');
+    const titleInput = qs<HTMLInputElement>('#categoryTitle');
     if (titleInput) titleInput.value = cat.title || '';
 
     document.getElementById('categoryEditCancel')?.addEventListener('click', () => {
@@ -785,7 +811,7 @@ async function initCategoryEditForm(type, id) {
 
     newForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const title = document.querySelector('#categoryTitle')?.value?.trim();
+      const title = qs<HTMLInputElement>('#categoryTitle')?.value?.trim();
       if (!title) {
         alert('Введите название');
         return;
@@ -794,7 +820,8 @@ async function initCategoryEditForm(type, id) {
         await window.api.updateCategory(type, id, title);
         router.navigate(cancelPath);
       } catch (err) {
-        alert(err.message || 'Ошибка сохранения категории');
+        const message = err instanceof Error ? err.message : 'Ошибка сохранения категории';
+        alert(message);
       }
     });
   } catch {
