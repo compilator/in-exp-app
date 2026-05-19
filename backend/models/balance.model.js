@@ -1,30 +1,47 @@
 const TAFFY = require('taffy');
-const balances = TAFFY(require('../data/balances-initial.json'));
+const db = require('../utils/db.utils');
+
+const COLLECTION = 'balances';
+let balances = null;
+
+function getStore() {
+  if (!balances) {
+    balances = TAFFY(db.get(COLLECTION));
+  }
+  return balances;
+}
+
+function persist() {
+  db.set(COLLECTION, db.exportTaffy(getStore()));
+}
 
 class BalanceModel {
-    static findOne(userId) {
-        userId = parseInt(userId);
-        let balance = balances({user_id: userId}).first()
-        if (!balance) {
-            balance = this.create(userId);
-        }
-        return balance;
+  static findOne(userId) {
+    userId = parseInt(userId);
+    let balance = getStore()({ user_id: userId }).first();
+    if (!balance) {
+      balance = this.create(userId);
+    }
+    return balance;
+  }
+
+  static create(userId) {
+    const record = { user_id: parseInt(userId), balance: 0 };
+    getStore().insert(record);
+    persist();
+    return record;
+  }
+
+  static update(userId, newBalance) {
+    userId = parseInt(userId);
+    const balance = this.findOne(userId);
+    if (balance) {
+      getStore()({ user_id: userId }).update({ balance: parseFloat(newBalance) });
+      persist();
     }
 
-    static create(userId) {
-        balances.insert({user_id: parseInt(userId), balance: 0});
-        return {user_id: userId, balance: 0};
-    }
-
-    static update(userId, newBalance) {
-        userId = parseInt(userId);
-        const balance = this.findOne(userId);
-        if (balance) {
-            balances({user_id: userId}).update({balance: parseFloat(newBalance)});
-        }
-
-        return newBalance;
-    }
+    return newBalance;
+  }
 }
 
 module.exports = BalanceModel;

@@ -1,5 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const db = require('./utils/db.utils');
+
+db.init();
+
 const authRoutes = require('./routes/auth.routes');
 const expenseCategoriesRoutes = require('./routes/category-expense.routes');
 const incomeCategoriesRoutes = require('./routes/category-income.routes');
@@ -17,4 +21,7 @@ app.use("/api/categories/income", incomeCategoriesRoutes);
 app.use("/api/operations", operationsRoutes);
 app.use("/api/balance", balanceRoutes);
 
-app.listen('3000');
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Backend запущен: http://localhost:${PORT}`);
+});

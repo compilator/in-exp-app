@@ -11,10 +11,10 @@ module.exports = (env, argv) => {
   return {
     context: __dirname,
     entry: {
-      app: './frontend/scripts/app.js',
-      dashboard: './frontend/scripts/dashboard.js',
-      login: './frontend/scripts/login.js',
-      reg: './frontend/scripts/reg.js',
+      app: './frontend/scripts/app.ts',
+      dashboard: './frontend/scripts/dashboard.ts',
+      login: './frontend/scripts/login.ts',
+      reg: './frontend/scripts/reg.ts',
     },
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -30,10 +30,18 @@ module.exports = (env, argv) => {
       runtimeChunk: false,
     },
     resolve: {
-      extensions: ['.js'],
+      extensions: ['.ts', '.js'],
     },
     module: {
       rules: [
+        {
+          test: /\.tsx?$/,
+          use: {
+            loader: 'ts-loader',
+            options: { transpileOnly: true },
+          },
+          exclude: /node_modules/,
+        },
         {
           test: /\.css$/i,
           use: [

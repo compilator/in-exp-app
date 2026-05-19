@@ -1,28 +1,30 @@
 import '../styles/style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
-import './api.js';
+import './api';
 
-function initRegister() {
+type RegisterField = 'name' | 'lastName' | 'email' | 'password' | 'passwordRepeat';
+
+function initRegister(): void {
   if (window.__registerInitialized) {
     return;
   }
   window.__registerInitialized = true;
 
   const registerForm = document.querySelector('form');
-  const inputs = {
+  const inputs: Record<RegisterField, HTMLInputElement | null> = {
     name: document.querySelector('#name'),
     lastName: document.querySelector('#last-name'),
     email: document.querySelector('#email'),
     password: document.querySelector('#password'),
-    passwordRepeat: document.querySelector('#password2')
+    passwordRepeat: document.querySelector('#password2'),
   };
 
   if (!registerForm) {
     return;
   }
 
-  const validators = {
+  const validators: Record<RegisterField, (value: string) => string> = {
     lastName: (value) => {
       if (!value?.trim()) return 'Фамилия обязательна';
       if (!/^[А-ЯЁ][а-яё\s]+$/.test(value.trim())) {
@@ -55,10 +57,10 @@ function initRegister() {
       if (!value) return 'Подтвердите пароль';
       if (value !== inputs.password?.value) return 'Пароли не совпадают';
       return '';
-    }
+    },
   };
 
-  function showError(input, message) {
+  function showError(input: HTMLInputElement | null, message: string): void {
     if (!input) return;
     input.classList.add('is-invalid');
     const formControl = input.closest('.form-floating');
@@ -73,7 +75,7 @@ function initRegister() {
     errorSpan.textContent = message;
   }
 
-  function clearError(input) {
+  function clearError(input: HTMLInputElement | null): void {
     if (!input) return;
     input.classList.remove('is-invalid');
     const formControl = input.closest('.form-floating');
@@ -82,11 +84,11 @@ function initRegister() {
     if (errorSpan) errorSpan.textContent = '';
   }
 
-  function clearAllErrors() {
-    Object.values(inputs).forEach(input => clearError(input));
+  function clearAllErrors(): void {
+    Object.values(inputs).forEach((input) => clearError(input));
   }
 
-  Object.keys(inputs).forEach(key => {
+  (Object.keys(inputs) as RegisterField[]).forEach((key) => {
     const input = inputs[key];
     if (input) {
       input.addEventListener('input', () => {
@@ -103,7 +105,7 @@ function initRegister() {
     clearAllErrors();
     let isValid = true;
 
-    Object.keys(validators).forEach(key => {
+    (Object.keys(validators) as RegisterField[]).forEach((key) => {
       const input = inputs[key];
       if (input) {
         const error = validators[key](input.value);
@@ -120,22 +122,26 @@ function initRegister() {
 
     try {
       await window.api.signup(
-        inputs.name.value.trim(),
-        inputs.lastName.value.trim(),
-        inputs.email.value.trim(),
-        inputs.password.value,
-        inputs.passwordRepeat.value
+        inputs.name!.value.trim(),
+        inputs.lastName!.value.trim(),
+        inputs.email!.value.trim(),
+        inputs.password!.value,
+        inputs.passwordRepeat!.value
       );
 
       window.location.assign(new URL('login.html', window.location.href).href);
-
     } catch (error) {
-      let serverMessage = error.message || 'Произошла ошибка при регистрации';
+      const serverMessage =
+        error instanceof Error ? error.message : 'Произошла ошибка при регистрации';
 
-      if (serverMessage.includes('exists') || serverMessage.includes('уже') || serverMessage.includes('Email')) {
+      if (
+        serverMessage.includes('exists') ||
+        serverMessage.includes('уже') ||
+        serverMessage.includes('Email')
+      ) {
         showError(inputs.email, 'Пользователь с таким email уже зарегистрирован');
       } else {
-        let errorElement = document.querySelector('.error-message');
+        let errorElement = document.querySelector('.error-message') as HTMLElement | null;
         if (!errorElement) {
           errorElement = document.createElement('div');
           errorElement.className = 'error-message alert alert-danger mt-3';
